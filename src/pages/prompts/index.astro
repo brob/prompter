@@ -1,0 +1,16 @@
+---
+import { client } from "../../utils/client"
+import Layout from '../../layouts/Layout.astro'
+
+const {prompts} = await client.request(`query MyQuery { prompts(orderBy: date_DESC) {title, slug}}`)
+---
+
+<Layout title="Prompt Archive">
+
+<h2>Past Prompts</h2>
+    <ul>
+        {prompts.map((prompt) => <li><a href={`/prompts/${prompt.slug}`}>{prompt.title}</a></li>)}
+    </ul>
+
+
+</Layout>

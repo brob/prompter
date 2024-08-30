@@ -1,0 +1,21 @@
+---
+import Form from '../components/Form.astro'
+
+const {prompt} = Astro.props
+
+---
+
+<style>
+    h3 {
+        margin-top: 4rem;
+        font-weight: normal;
+        font-size: 2rem;
+    }
+</style>
+
+<h3><strong>Prompt:</strong> {prompt.title}</h3>
+
+<div set:html={prompt.body.html}></div>
+
+<h3>Tell us your story:</h3>
+<Form promptId={prompt.id} />

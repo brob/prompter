@@ -1,0 +1,55 @@
+---
+import Layout from "../../layouts/Layout.astro"
+import { client } from "../../utils/client"
+
+
+const {id} = Astro.params
+
+const {story} = await client.request(`query MyQuery($id: ID!) {
+  story: userStory(where: {id: $id}) {
+    storyRte {
+      html
+    }
+    userName
+    userId
+    prompts{
+      slug
+      title
+    }
+  }
+}`, {id})
+
+---
+
+<style>
+    .share-prompt {
+        background: var(--accent-gradient);
+        color: white;
+        padding: .5rem 1rem;
+
+    }
+    .share-prompt a {
+        color: black;
+    }
+    blockquote {
+        padding: .5rem;
+        background-color: #f8d3ff;
+        color: black;
+        margin-inline-start: .5rem;
+    }
+</style>
+
+
+<Layout title="My story">
+
+    <div set:html={story.storyRte.html}></div>
+    <p>By {story.userName}</p>
+
+
+    <div class="share-prompt">
+        <h3>Share your story</h3>
+        <blockquote>I wrote a story based on the prompt {story.prompts.title} on Prompter: <a href={`/stories/${story.id}`}>Story Link</a></blockquote>
+    </div>
+
+    <p>Story Prompt: <a href={`/prompts/${story.prompts.slug}`}>{story.prompts.title}</a></p>
+</Layout>

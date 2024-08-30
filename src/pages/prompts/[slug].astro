@@ -1,0 +1,35 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Form from '../../components/Form.astro';
+import { client } from '../../utils/client';
+
+const { slug } = Astro.params;
+console.log({slug})
+const { prompt } = await client.request(`
+  query Prompts($slug: String!) {
+    prompt(where: {slug: $slug}) {
+      id
+      title
+      slug
+      body {
+        raw
+        html
+      }
+      date
+    }
+  }`, { slug });
+
+
+console.log({prompt})
+  
+---
+
+
+<Layout title={prompt.title}>
+    <main>
+    <h1>{prompt.title}</h1>
+    <div set:html={prompt.body.html}></div>
+
+    <Form promptId={prompt.id} />
+</main>
+</Layout>

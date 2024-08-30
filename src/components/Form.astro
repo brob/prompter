@@ -1,0 +1,95 @@
+---
+import { actions } from "astro:actions";
+
+const result = Astro.getActionResult(actions.storySubmit);
+const { promptId } = Astro.props;
+
+
+---
+
+<style is:global>
+  .ql-editor {
+    min-height: 200px;
+  }
+  input[type="submit"] {
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    color: white;
+    background-color: rgb(84, 105, 212);
+    box-shadow:
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px,
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px,
+      rgb(0 0 0 / 12%) 0px 1px 1px 0px,
+      rgb(84 105 212) 0px 0px 0px 1px,
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px,
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px,
+      rgb(60 66 87 / 8%) 0px 2px 5px 0px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 8px;
+    display: inline-block;
+    min-height: 28px;
+    transition:
+      background-color 0.24s,
+      box-shadow 0.24s;
+  }
+</style>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css"
+/>
+
+{
+  result?.data && (
+    <div
+      class="instructions"
+      style="white-space: pre-line"
+      set:html={result.data.story}
+    >
+      {result.data.story}
+    </div>
+  )
+}
+{result?.error && <h2>{result.error}</h2>}
+
+<form method="POST" action={actions.storySubmit}>
+  <input type="text" name="promptId" value={promptId} readonly hidden />
+  <div style="background-color: white; color: black" id="editorjs"></div>
+  <div id="editor" style="background-color: white; color: black">
+    <p>Write your story in this box...</p>
+  </div>
+  <textarea hidden readonly name="story" style="border:1px solid"></textarea>
+  <input style="border:1px solid" type="submit" />
+</form>
+
+<script>
+  import Quill from "quill";
+
+  const container = document.getElementById("editor");
+  const textArea = document.querySelector("[name=story]");
+
+  console.log({ textArea });
+  const quill = new Quill(container, {
+    modules: {
+      toolbar: [
+        ["bold", "italic", "underline"], // dropdown with defaults from theme
+      ],
+    },
+    placeholder: "Compose an epic...",
+    theme: "snow",
+  });
+
+  quill.on("text-change", (delta, oldDelta, source) => {});
+  const form = document.querySelector("form");
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const quillData = await quill.getSemanticHTML();
+
+    textArea.value = quillData;
+    // console.log(form)
+    form.submit();
+  });
+</script>
